@@ -18,3 +18,5 @@ Beyond basic prediction, this project can be extended to:
 * **Predict taxi demand:**  Forecast the number of pickups in specific regions. This information can be invaluable for dispatchers in making strategic decisions to maximize profitability.
 
 This project offers a practical application of machine learning techniques to real-world transportation data, providing valuable insights into the NYC transportation landscape.
+
+![image](https://github.com/user-attachments/assets/b713f6ca-c30e-46dc-89cf-90c67b195851)
