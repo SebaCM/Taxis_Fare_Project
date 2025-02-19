@@ -19,6 +19,18 @@ Beyond basic prediction, this project can be extended to:
 
 This project offers a practical application of machine learning techniques to real-world transportation data, providing valuable insights into the NYC transportation landscape.
 
+## Team Members and Tasks
+
+| Team Member           | Task       |
+|-----------------------|------------|
+| Anthony Zambrano      | Data       |
+| Alejandro Barcos	    | Data       |
+| Carlos Miranda  	    | Data       |
+| Mauricio Varela       | Web Service|
+| Alejandro Leguizamo   | Web Service|
+| Sebastián Carrillo    | Web Service|
+
+
 ![image](https://github.com/user-attachments/assets/b713f6ca-c30e-46dc-89cf-90c67b195851)
 The image above represents the structure and timing to develop this project
 ![image](https://github.com/user-attachments/assets/594a53fc-4ab9-4df6-8455-8db4f72ba8b8)
