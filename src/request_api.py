@@ -18,7 +18,6 @@ async def calculate_route(request: RouteRequest):
 
     url = f'https://routes.googleapis.com/directions/v2:computeRoutes'
    # f"https://maps.googleapis.com/maps/api/directions/json?origin={origin}&destination={destination}&key={API_KEY}"
-#
     response = requests.get(url)
     route_data = response.json()
 
