@@ -1,0 +1,40 @@
+version: '3.11.10'
+
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+      - db
+
+  model:
+    build:
+      context: ./model
+      dockerfile: Dockerfile
+    volumes:
+      - ./data:/app/data  # Mount data directory for datasets
+
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+
+  db:
+    image: "google/cloud-sdk:latest"  # Use appropriate image for your database
+    environment:
+      - DB_USER=your_user
+      - DB_PASS=your_password
+      - DB_NAME=your_db_name
+    ports:
+      - "5432:5432"  # Change port as needed
