@@ -1,4 +1,4 @@
-version: '3.11.10'
+version: '3.8'
 
 services:
   api:
@@ -24,6 +24,15 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"  # Expose port 80 for HTTP
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Mount your Nginx configuration file
+    depends_on:
+      - ui  # Ensure the UI service is started before Nginx
 
   redis:
     image: "redis:alpine"
