@@ -1,49 +1,80 @@
 version: '3.8'
 
 services:
+
   api:
-    build:
+   image: fastapi
+   container_name: ml_api
+   build:
       context: ./api
       dockerfile: Dockerfile
-    ports:
+      target: build
+   ports:
       - "5000:5000"
-    depends_on:
+   depends_on:
       - redis
       - db
+   networks:
+      - shared_network
 
   model:
     build:
       context: ./model
       dockerfile: Dockerfile
+    depends_on:
+      - redis
+      - db
     volumes:
       - ./data:/app/data  # Mount data directory for datasets
+    networks:
+      - shared_network
 
   ui:
+    image: ml_ui
+    container_name: ml_ui
     build:
       context: ./ui
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    networks:
+      - shared_network
+
 
   nginx:
     image: nginx:alpine
     ports:
-      - "80:80"  # Expose port 80 for HTTP
+      - "8080:80"  # Expose port 80 for HTTP
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf  # Mount your Nginx configuration file
     depends_on:
       - ui  # Ensure the UI service is started before Nginx
+    networks:
+      - shared_network
 
   redis:
     image: "redis:alpine"
     ports:
       - "6379:6379"
+    networks:
+      - shared_network
 
   db:
-    image: "google/cloud-sdk:latest"  # Use appropriate image for your database
+    image: postgres:latest
+    container_name: postgres_db
     environment:
-      - DB_USER=your_user
-      - DB_PASS=your_password
-      - DB_NAME=your_db_name
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"  # Change port as needed
+      - "5432:5432"
+    networks:
+      - shared_network
+
+  networks:
+   shared_network:
+    external: true
+  volumes:
+    postgres_data:

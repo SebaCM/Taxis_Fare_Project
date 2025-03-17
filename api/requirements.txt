@@ -1,0 +1,4 @@
+fastapi==0.115.8
+redis==5.2.1
+requests==2.32.3
+pydantic>=2.7.0,<3.0.0
