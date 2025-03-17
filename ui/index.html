@@ -22,9 +22,7 @@
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;700&display=swap&display=swap"></noscript>
   <link rel="stylesheet" href="https://r.mobirisesite.com/1253703/assets/css/mbr-additional.css?rnd=1740892347736" type="text/css">
   
-  
-  
-  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 
 <style>
@@ -206,13 +204,125 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-lg-7">
-                <div class="image-wrapper">
-                    <img src="https://r.mobirisesite.com/1253703/assets/images/photo-1550009627-1ff928082793.jpeg" alt="">
+            <div class="col-12 col-lg-8">
+                <div class="row d-flex justify-content-center py-5">
+                    <div class="col-md-8 col-lg-6 col-xl-9">
+                        <div class="card1 text-body1" style="border-radius: 35px;">
+                            <div class="card-body1 p-4">
+                                <div class="d-flex">
+                                    <h6 class="flex-grow-1" id="location">New York</h6>
+                                    <h6 id="time">15:07</h6>
+                                </div>
+                                <div class="d-flex flex-column text-center mt-5 mb-4">
+                                    <h6 class="display1-4 mb-0 font-weight-bold" id="temperature">13°C</h6>
+                                    <span class="small1" style="color: #868B94" id="weather-condition">Stormy</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1" style="font-size: 1rem;">
+                                        <div><i class="fas fa-wind fa-fw" style="color: #868B94;"></i> <span class="ms-1" id="wind-speed">40 km/h</span></div>
+                                        <div><i class="fas fa-tint fa-fw" style="color: #868B94;"></i> <span class="ms-1" id="humidity">84%</span></div>
+                                        <div><i class="fas fa-sun fa-fw" style="color: #868B94;"></i> <span class="ms-1" id="sunshine">0.2h</span></div>
+                                    </div>
+                                    <div>
+                                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-weather/ilu1.webp" width="100px" id="weather-icon">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        function updateTime() {
+            const options = { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false };
+            const formatter = new Intl.DateTimeFormat([], options);
+            document.getElementById('time').textContent = formatter.format(new Date());
+        }
+    
+        setInterval(updateTime, 60000); // Actualiza cada minuto
+        updateTime(); // Llama a la función al cargar la página
+    </script>
+    <script>
+        // Example function to update the weather data
+        function updateWeatherData(data) {
+            document.getElementById('location').textContent = data.location;
+            document.getElementById('time').textContent = data.time;
+            document.getElementById('temperature').textContent = `${data.temperature}°C`;
+            document.getElementById('weather-condition').textContent = data.condition;
+            document.getElementById('wind-speed').textContent = `${data.windSpeed} km/h`;
+            document.getElementById('humidity').textContent = `${data.humidity}%`;
+            document.getElementById('sunshine').textContent = `${data.sunshine}h`;
+            // Update the weather icon based on the condition
+            // document.getElementById('weather-icon').src = 'new-icon-url-based-on-condition';
+        }
+    
+        // Simulate fetching data from the Python script
+        const weatherData = {
+            location: 'New york',
+            time: '15:07',
+            temperature: 13,
+            condition: 'Stormy',
+            windSpeed: 40,
+            humidity: 84,
+            sunshine: 0.2
+        };
+    
+        // Update the HTML with the fetched data
+        updateWeatherData(weatherData);
+    </script>
+    
+        <style>
+            body1 {
+                font-family: Arial, sans-serif;
+            }
+            .container1 {
+                max-width: 1400px; /* Increase the max-width for a larger container */
+                margin: 0 auto;
+                padding: 40px; /* Increase padding for more space */
+            }
+            .content-wrapper1 {
+                padding: 30px; /* Increase padding */
+            }
+            .mbr-section-title1 {
+                font-size: 3rem; /* Further increase the font size */
+            }
+            .mbr-text1 {
+                font-size: 2rem; /* Further increase the font size */
+            }
+            .mbr-section-btn1 .btn1 {
+                font-size: 2rem; /* Further increase the button font size */
+                padding: 20px 40px; /* Further increase button padding */
+            }
+            .card1 {
+                border-radius: 45px;
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.); /* Increase shadow for more depth */
+            }
+            .card-body1 {
+                padding: 80px; /* Further increase padding */
+            }
+            .card1 h6 {
+                font-size: 2rem; /* Further increase the font size */
+            }
+            .display1-4 {
+                font-size: 4rem; /* Further increase the font size */
+            }
+            .small1 {
+                font-size: 1.5rem; /* Further increase the font size */
+            }
+            .card-weather1{
+                width: 200px;
+                height: 200px;
+            }
+            .fas1 {
+                font-size: 2rem; /* Further increase icon size */
+            }
+            img {
+                width: 200px; /* Further increase image size */
+                height: 200px;
+            }
+        </style>
 </section>
 
 <section data-bs-version="5.1" class="features04 ridem5 cid-uEeiMRu4FW" id="features-4-uEeiMRu4FW">
