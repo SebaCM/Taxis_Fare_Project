@@ -4,7 +4,7 @@ WORKDIR /code
 
 COPY ./requirements.txt /code/requirements.txt
 
-RUN pip install --upgrade -r /code/requirements.txt
+RUN pip install --upgrade --use-pep517 -r /code/requirements.txt
 RUN pip install fastapi[standard]
 
 COPY ./app /code/app
