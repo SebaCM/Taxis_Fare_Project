@@ -3,18 +3,18 @@ version: '3.8'
 services:
 
   api:
-   image: fastapi
-   container_name: ml_api
-   build:
+    image: fastapi
+    container_name: ml_api
+    build:
       context: ./api
       dockerfile: Dockerfile
       target: build
-   ports:
+    ports:
       - "8000:8000"
-   depends_on:
+    depends_on:
       - redis
       - db
-   networks:
+    networks:
       - shared_network
 
   model:
@@ -39,7 +39,6 @@ services:
       - "3000:3000"
     networks:
       - shared_network
-
 
   nginx:
     image: nginx:alpine
@@ -73,8 +72,9 @@ services:
     networks:
       - shared_network
 
-  networks:
-   shared_network:
+networks:
+  shared_network:
     external: true
-  volumes:
-    postgres_data:
+
+volumes:
+  postgres_data:
