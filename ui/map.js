@@ -134,3 +134,55 @@ function isWithinNYC(latLng) {
 
     return nyBounds.contains(latLng);
 }
+async function getWeatherData() {
+    try {
+        const latitude = 40.7143; // Example latitude (NY)
+        const longitude = -74.006; // Example longitude (NY)
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m&current_weather=true&hourly=relative_humidity_2m`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(data); // Process the weather data here
+        // Access the current weather code
+        console.log("Current weather code: ", data.current_weather.weathercode);
+        //Access the hourly temperatures
+        console.log("Hourly temperatures: ", data.hourly.temperature_2m);
+        const weather_images = {
+            0: "soleado.jpeg",
+            1: "lloviendo_sol.jpeg",
+            2: "lloviendo.jpeg",
+            3: "nieve.jpeg",
+            4: "viento.jpeg"
+        }
+        const weather_conditions = {
+            0: "Sunny",
+            1: "Sunny Rainy",
+            2: "Rainning",
+            3: "Snowing",
+            4: "Winding"
+        }
+            const options = { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false };
+            const formatter = new Intl.DateTimeFormat([], options);
+            hour = formatter.format(new Date());
+            indice=((parseInt(hour.substring(0,2))*60+parseInt(hour.substring(3,5)))/15).toFixed(0);
+            console.log(indice);
+            document.getElementById('time').textContent = formatter.format(new Date())
+            document.getElementById('weather-icon').src = `images/${weather_images[data.current_weather.weathercode]}`;
+            document.getElementById('temperature').textContent = `${data.current_weather.temperature}°C`;    
+            document.getElementById('weather-condition').textContent = `${weather_conditions[data.current_weather.weathercode]}`;     
+            document.getElementById('wind-speed').textContent = `${data.current_weather.windspeed} km/h`;
+            document.getElementById('humidity').textContent = `${data.hourly.relative_humidity_2m[indice]}%`;
+
+    } catch (error) {
+        console.error("Error fetching weather data:", error);
+    }
+
+
+}
+
+getWeatherData();

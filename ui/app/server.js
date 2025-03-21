@@ -1,7 +1,6 @@
 const express = require('express');
 const redis = require('redis');
 const bodyParser = require('body-parser');
-
 const app = express();
 const port = 3000;
 
@@ -26,7 +25,7 @@ app.use(express.static('ui')); // Sirve tus archivos HTML/JS
 
 // Nueva ruta para obtener datos de Redis para map.js
 app.get('/tripPredict', (req, res) => {
-  client.get('tripPredict', (err, data) => { // Asumiendo que 'mapData' es la clave en Redis
+  client.get('tripPredict', (err, data) => { // Asumiendo que 'tripPredict' es la clave en Redis
     if (err) {
       console.error(err);
       res.status(500).send('Error al obtener datos de Redis');
@@ -57,3 +56,12 @@ app.post('/formData', (req, res) => {
       }
     });
   });
+  
+const params = {
+	"latitude": 52.52,
+	"longitude": 13.41,
+	"hourly": "temperature_2m",
+	"current": "weather_code"
+};
+const url = "https://api.open-meteo.com/v1/forecast";
+const responses = await open_weather.fetchWeatherApi(url, params);

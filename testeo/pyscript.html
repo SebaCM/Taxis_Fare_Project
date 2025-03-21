@@ -4,14 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Visualization with PyScript</title>
-    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
-    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.5.2/core.css">
+
+    <!-- This script tag bootstraps PyScript -->
+    <!-- This script tag bootstraps PyScript -->
+    <script type="module" src="https://pyscript.net/releases/2024.5.2/core.js"></script>
+
 </head>
 <body>
     <section class="pyscript">
         <div>
-            <img src="" width="100px" id="weather-icon">
+            <img width="100px" id="weather-icon">
         </div>
+        <label id="titulo"></label>
         <script type="py" src="./main.py" config="./pyscript.toml"></script>
     </section>
 </body>
