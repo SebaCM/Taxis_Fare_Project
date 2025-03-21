@@ -1,0 +1,131 @@
+& when not (@fullScreen) {
+    padding-top: (@paddingTop * 1rem);
+    padding-bottom: (@paddingBottom * 1rem);
+  }
+  & when (@bg-type = 'color') {
+    background-color: @bg-value;
+  }
+  & when (@bg-type = 'image') {
+    background-image: url(@bg-value);
+  }
+  .mbr-fallback-image.disabled {
+    display: none;
+  }
+  .mbr-fallback-image {
+    display: block;
+    background-size: cover;
+    background-position: center center;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    & when (@bg-type = 'video') {
+      background-image: url(@fallBackImage);
+    }
+  }
+  .row {
+    justify-content: space-between;
+  }
+  .content-wrapper {
+    .mbr-desc {
+      margin-bottom: 70px;
+      @media (max-width: 992px) {
+        margin-bottom: 35px;
+      }
+    }
+    .panel-group {
+      .card {
+        position: relative;
+        border-radius: 0 !important;
+        padding: 40px 0;
+        background-color: transparent;
+        border-bottom: 1px solid @border;
+        @media (max-width: 992px) {
+          padding: 25px 0;
+        }
+        &:hover, &:focus {
+          &::before {
+            width: 100%;
+          }
+        }
+        &::before {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 0;
+          width: 0;
+          height: 1px;
+          background-color: @iconBg;
+          transition: all 0.3s ease-in-out;
+        }
+        .card-header {
+          background-color: transparent;
+          border: none;
+          border-radius: 0;
+          padding: 0;
+          .panel-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            .panel-title-edit {
+              margin-bottom: 0;
+            }
+            .icon-wrapper {
+              width: 48px;
+              height: 48px;
+              min-width: 48px;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              margin-left: 16px;
+              transition: all 0.3s ease-in-out;
+              border-radius: 100%;
+              background-color: @iconBg;
+              .mbr-iconfont {
+                font-size: 16px;
+                font-weight: 700 !important;
+                transition: all 0.3s ease-in-out;
+                color: @icon;
+                margin-top: 4px;
+              }
+            }
+            &:not(.collapsed) {
+              .icon-wrapper {
+                transform: rotate(180deg);
+              }
+            }
+          }
+        }
+        .panel-collapse {
+          .panel-body {
+            padding-top: 25px;
+            .list {
+              padding: 0;
+              margin: 0 0 0 50%;
+              list-style-type: none;
+              @media (max-width: 992px) {
+                margin: 0;
+              }
+              .item-wrap {
+                margin-bottom: 15px;
+                &:last-child {
+                  margin-bottom: 0;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .mbr-desc {
+    color: #000000;
+  }
+  .panel-title-edit {
+    color: #000000;
+  }
+  .list {
+    color: #000000;
+  }
+  

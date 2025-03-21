@@ -1,0 +1,14 @@
+{
+    "name": "google-maps-redis",
+    "version": "1.0.0",
+    "description": "Aplicación Node.js con Redis y Google Maps",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js"
+    },
+    "dependencies": {
+      "express": "^4.17.1",
+      "redis": "^4.0.0",
+      "body-parser": "^1.19.0"
+    }
+  }

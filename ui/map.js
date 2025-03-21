@@ -1,3 +1,4 @@
+
 let map; // Declara la variable map fuera de initMap
 let directionsRenderer;
 function initMap() {
@@ -11,7 +12,38 @@ function initMap() {
       const directionsRenderer = new google.maps.DirectionsRenderer({
         map: map,
         });
-}
+
+    }
+    
+    function getPredict() {
+      fetch('http://node_redis:3000/tripPredict') // Usamos 'node_redis' como hostname
+        .then((response) => response.json())
+        .then((data) => {
+          // Actualiza los elementos HTML con los datos recibidos
+          document.getElementById('trip_fare').textContent = `$ ${data.fare}`;
+          document.getElementById('trip_duartion').textContent = `Time ${data.duration} min`;
+          // ... (actualiza otros elementos según sea necesario) ...
+        })
+        .catch((error) => console.error('Error al obtener datos del mapa:', error));
+    }
+    function sendFormDataToRedis() {
+        // Obtiene los datos del formulario
+        const startPoint = document.getElementById('Start Point-formbuilder-1').value;
+        const endPoint = document.getElementById('End point-formbuilder-1').value;
+        const passengerCount = document.getElementById('Number-formbuilder-1').value;
+      
+        // Envía los datos al servidor Node.js
+        fetch('http://node_redis:3000/formData', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ startPoint, endPoint, passengerCount }),
+        })
+          .then((response) => response.text())
+          .then((data) => console.log(data))
+          .catch((error) => console.error('Error al enviar datos del formulario:', error));
+      }
 
 document.addEventListener('DOMContentLoaded', function() {
     const submitButton = document.getElementById('submitButton');
@@ -28,6 +60,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         calculateAndDisplayRoute(startPoint, endPoint);
+        sendFormDataToRedis();
+        getPredict()
+
     });
 });
 
@@ -88,7 +123,7 @@ function calculateAndDisplayRoute(origin, destination) {
             alert("No se pudo geocodificar el punto de origen.");
         }
     });
-}
+  }
 
 function isWithinNYC(latLng) {
     // Definir los límites aproximados de Nueva York (puedes ajustarlos según sea necesario)
