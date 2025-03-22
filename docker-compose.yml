@@ -30,7 +30,7 @@ services:
       context: ./ui
       dockerfile: Dockerfile
     ports:
-      - "8080:80"
+      - "8081:80"
     depends_on:
       - redis
       - node_redis
@@ -47,14 +47,23 @@ services:
       - shared_network
     depends_on:
       - redis
-
   redis:
+    container_name: redis
     image: "redis:alpine"
     ports:
       - "6379:6379"
     networks:
       - shared_network
-
+  test:
+    container_name: test
+    build:
+      context: ./test
+      dockerfile: Dockerfile
+    networks:
+      - shared_network
+    depends_on:
+      - redis
 networks:
   shared_network:
     external: true
+    name: shared_network
