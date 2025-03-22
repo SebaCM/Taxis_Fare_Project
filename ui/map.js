@@ -38,7 +38,7 @@ function initMap() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ startPoint, endPoint, passengerCount,distance,duration }),
+          body: JSON.stringify({ startPoint, endPoint, passengerCount, distance, duration }),
         })
           .then((response) => response.text())
           .then((data) => console.log(data))
@@ -61,7 +61,10 @@ function initMap() {
     
             try {
                 const routeData = await calculateAndDisplayRoute(startPoint, endPoint);
-                sendFormDataToRedis(routeData.distance, routeData.duration);
+                console.log(routeData.distance);
+                duration=parseInt(routeData.duration.replace(' min', ''));
+                console.log(duration);
+                sendFormDataToRedis(routeData.distance, duration);
                 getPredict();
             } catch (error) {
                 alert(error);
@@ -109,6 +112,7 @@ function initMap() {
                                         const route = response.routes[0];
                                         const distance = route.legs[0].distance.value / 1000;
                                         const duration = route.legs[0].duration.text;
+                                        document.getElementById("distance").innerHTML = `<b>    Distance </b> ${distance.toFixed(2)} km`;
                                         resolve({ distance: distance, duration: duration });
                                     } else {
                                         reject("No se encontraron rutas: " + status);

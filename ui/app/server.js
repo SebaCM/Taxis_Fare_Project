@@ -44,8 +44,8 @@ app.get("/tripPredict", async (req, res) => {
 });
 
 app.post("/formData", async (req, res) => {
-  const { startPoint, endPoint, passengerCount } = req.body;
-  const formData = { startPoint, endPoint, passengerCount };
+  const { startPoint, endPoint, passengerCount, distance ,duration } = req.body;
+  const formData = { startPoint, endPoint, passengerCount, distance, duration };
 
   try {
     await client.set("formData", JSON.stringify(formData));
