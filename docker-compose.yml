@@ -18,7 +18,8 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - redis
-
+    ports:
+      - "5000:5000"
     volumes:
       - ./data:/app/data  # Mount data directory for datasets
     networks:
