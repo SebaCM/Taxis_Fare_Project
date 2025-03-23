@@ -109,29 +109,38 @@ def get_weather_data():
         "longitude": longitude,
         "hourly": ["temperature_2m", "weather_code", "rain", "showers", "snowfall", "snow_depth"],
         "current_weather": True,
+      	"current": ["weather_code", "is_day", "precipitation", "temperature_2m"],
         "timezone": "America/New_York"
     }
     response = openmeteo.weather_api(url, params=params)[0]
-    current_weather = response.current_weather
-    hourly_data = response.hourly
+    current = response.Current()
+    hourly = response.Hourly()
+    current_temperature=current.Variables(3).Value()
+    current_precipitation = current.Variables(2).Value()						
+    current_weather_code = current.Variables(0).Value()
+    current_is_day = current.Variables(1).Value()
+    hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()[0]
+    hourly_rain = hourly.Variables(1).ValuesAsNumpy()[0]
+    hourly_showers = hourly.Variables(2).ValuesAsNumpy()[0]
+    hourly_snowfall = hourly.Variables(3).ValuesAsNumpy()[0]
+    hourly_snow_depth = hourly.Variables(4).ValuesAsNumpy()[0]
+    hourly_weather_code = hourly.Variables(5).ValuesAsNumpy()[0]
 
     # Get current time details
     current_time = datetime.now()
     current_hour = current_time.strftime("%Y-%m-%dT%H:00")
 
     # Find the index of the current hour in the hourly data
-    if current_hour in hourly_data["time"]:
-        index = hourly_data["time"].index(current_hour)
-    else:
-        index = 0  # Default to the first hour if current hour is not found
-
-    print(f"Weather data for New York City at {current_hour}: {current_weather}")
+    print(f"Weather data for New York City at {current_hour}: {current_weather_code}, {current_is_day}, {hourly_temperature_2m}, {hourly_rain}, {hourly_showers}, {hourly_snowfall}, {hourly_snow_depth}, {hourly_weather_code}")
     return {
-        "rain": hourly_data["rain"][index],
-        "snowfall": hourly_data["snowfall"][index],
-        "weather_code": hourly_data["weather_code"][index],
-        "snow_depth": hourly_data["snow_depth"][index],
-        "is_day": current_weather.is_day
+        "rain": hourly_rain,
+        "snowfall": hourly_snowfall,
+        "weather_code": current_weather_code,
+        "snow_depth": hourly_snow_depth,
+        "is_day": current_is_day,
+        "showers":hourly_showers,
+        "temperature":current_temperature,
+        "precipitation":current_precipitation
     }
 
 def classify_process():
@@ -146,70 +155,92 @@ def classify_process():
         # Take a new job from Redis
         print("Waiting for new job...")
         job_data = db.get("formData")
-        job_data = json.loads(job_data.decode('utf-8'))
-        print(f"Received job data: {job_data}")
+        if job_data:
+            job_data = json.loads(job_data.decode('utf-8'))
+            print(f"Received job data: {job_data}")
 
         # Extract the necessary data from the job
-        form_data = job_data
-        start_point = form_data["startPoint"]
-        end_point = form_data["endPoint"]
-        passenger_count = int(form_data["passengerCount"])
-        duration = form_data["duration"]
-        distance_km = form_data["distance"]
-        distance_miles = distance_km * 0.621371  # Convert distance to miles
+            form_data = job_data
+            start_point = form_data["startPoint"]
+            end_point = form_data["endPoint"]
+            passenger_count = int(form_data["passengerCount"])
+            duration = form_data["duration"]
+            distance_km = form_data["distance"]
+            distance_miles = distance_km * 0.621371  # Convert distance to miles
 
         # Get coordinates for start and end points
-        start_coords = get_coordinates(start_point)
-        end_coords = get_coordinates(end_point)
+            start_coords = get_coordinates(start_point)
+            end_coords = get_coordinates(end_point)
 
-        if start_coords and end_coords:
+            if start_coords and end_coords:
             # Find LocationID for start and end points
-            start_location_id = encontrar_zona_taxi(start_coords[0], start_coords[1])
-            end_location_id = encontrar_zona_taxi(end_coords[0], end_coords[1])
+                start_location_id = encontrar_zona_taxi(start_coords[0], start_coords[1])
+                end_location_id = encontrar_zona_taxi(end_coords[0], end_coords[1])
 
-            if start_location_id and end_location_id:
+                if start_location_id and end_location_id:
                 # Get weather data for New York City
-                weather_data = get_weather_data()
+                    weather_data = get_weather_data()
 
                 # Get current time details
-                current_time = datetime.now()
+                    current_time = datetime.now()
                 hour = current_time.hour
                 month = current_time.month
                 day_of_week = current_time.weekday()
-
+    
                 # Prepare features for prediction
                 fare_features = [
-                    distance_miles, duration, hour, month, day_of_week,
-                    weather_data["rain"], weather_data["snowfall"],
-                    weather_data["weather_code"], weather_data["is_day"]
+                         distance_miles,  # trip_distance
+                    1,  # payment_type (assuming 1 for simplicity)
+                    weather_data["rain"],  # rain
+                    weather_data["snowfall"],  # snowfall
+                    passenger_count,  # passenger_count
+                    weather_data["weather_code"],  # weather_code
+
+
+                    weather_data["precipitation"], # precipitation (assuming 0 for simplicity)
+                    hour,  # h
+                    month,  # m
+                    day_of_week,  # day_of_week
+                    weather_data["is_day"] 
                 ]
                 duration_features = [
-                    start_location_id, end_location_id, distance_miles, weather_data["rain"],
-                    weather_data["snowfall"], weather_data["weather_code"], weather_data["snow_depth"],
-                    duration, hour, day_of_week, month, weather_data["is_day"]
+                    distance_miles,  # trip_distance
+                    start_location_id,  # PULocationID
+                    end_location_id,  # DOLocationID
+                    weather_data["rain"],  # rain
+                    weather_data["snowfall"],  # snowfall
+                    weather_data["weather_code"],  # weather_code
+                    weather_data["snow_depth"],  # snow_depth
+                    hour,  # h
+                    day_of_week,  # day_of_week
+                    month,  # m
+                    weather_data["is_day"]  # is_day
                 ]
-
-                # Run predictions
+    
+                    # Run predictions
                 print(f"Running fare prediction with features: {fare_features}")
                 fare_prediction = predict_fare(fare_features)
                 print(f"Fare prediction: {fare_prediction}")
-
+    
                 print(f"Running duration prediction with features: {duration_features}")
                 duration_prediction = predict_duration(duration_features)
                 print(f"Duration prediction: {duration_prediction}")
-
-                # Prepare the output
+    
+                    # Prepare the output
                 output = {
-                    "fare": fare_prediction,
-                    "duration": duration_prediction
-                }
-
-                # Store the results on Redis using the original job ID as the key
+                        "fare": round(float(fare_prediction*10),2),
+                        "duration": round(float(duration_prediction*10),2)
+                    }
+    
+                    # Store the results on Redis using the original job ID as the key
                 db.set("tripPredict", json.dumps(output))
+                db.delete("formData")  # Delete the job from the queue
                 print(f"Stored prediction results in Redis: {output}")
-
+            else:
+                print("Error processing job data. Skipping...")
         # Sleep for a bit
         time.sleep(settings.SERVER_SLEEP)
+         
 
 if __name__ == "__main__":
     # Now launch process
