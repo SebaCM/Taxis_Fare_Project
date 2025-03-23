@@ -145,12 +145,12 @@ def classify_process():
     while True:
         # Take a new job from Redis
         print("Waiting for new job...")
-        job_data = db.brpop(settings.REDIS_QUEUE)[1]
+        job_data = db.get("formData")
         job_data = json.loads(job_data.decode('utf-8'))
         print(f"Received job data: {job_data}")
 
         # Extract the necessary data from the job
-        form_data = job_data["formData"]
+        form_data = job_data
         start_point = form_data["startPoint"]
         end_point = form_data["endPoint"]
         passenger_count = int(form_data["passengerCount"])
