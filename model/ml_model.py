@@ -32,7 +32,7 @@ except redis.ConnectionError:
     print("Failed to connect to Redis.")
 
 # Load models from pickle files
-with open('fare_model.pkl', 'rb') as f:
+with open('xgb_fare.pkl.pkl', 'rb') as f:
     fare_model = pickle.load(f)
     print("Loaded fare model successfully.")
 
