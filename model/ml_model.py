@@ -1,13 +1,11 @@
 import json
-import os
 import time
-import numpy as np
 import redis
 import settings
 import pandas as pd
 import pickle
 from shapely.geometry import Point, Polygon
-from geopy.geocoders import Nominatim
+#from geopy.geocoders import Nominatim
 from shapely import wkt
 from shapely.geometry import Point
 import openmeteo_requests
@@ -66,7 +64,7 @@ with open('duration_model.pkl', 'rb') as f:
     print("Loaded duration model successfully.")
 
 # Load taxi zones geometry data
-df_zones = pd.read_csv('taxis_zones_geometry.csv')
+#df_zones = pd.read_csv('taxis_zones_geometry.csv')
 print("Loaded taxi zones geometry data successfully.")
 
 def predict_fare(features):
@@ -90,26 +88,26 @@ def encontrar_zona_taxi(taxi_zones, coord_x, coord_y):
             return row["LocationID"]
     return None
 
-def get_coordinates(location_name):
-    """
-    Translates a location name into latitude and longitude coordinates.
+## def get_coordinates(location_name):
+#    """
+#    Translates a location name into latitude and longitude coordinates.
 
-    Args:
-        location_name: The name of the location (e.g., "Empire State Building").
+#    Args:
+#        location_name: The name of the location (e.g., "Empire State Building").
 
-    Returns:
-        A tuple containing the latitude and longitude coordinates, or None if the 
-        location is not found.
-    """
-    geolocator = Nominatim(user_agent="my_geocoder")  # Provide a user agent
-    location = geolocator.geocode(location_name)
-    if location:
-        print(f"Coordinates for {location_name}: {location.latitude}, {location.longitude}")
-        return location.longitude, location.latitude 
-    else:
-        print(f"Coordinates not found for {location_name}")
-        return None
-
+#    Returns:
+#        A tuple containing the latitude and longitude coordinates, or None if the 
+#        location is not found.
+#    """
+#    geolocator = Nominatim(user_agent="my_geocoder")  # Provide a user agent
+#    location = geolocator.geocode(location_name)
+#    if location:
+#        print(f"Coordinates for {location_name}: {location.latitude}, {location.longitude}")
+#        return location.longitude, location.latitude 
+#    else:
+#        print(f"Coordinates not found for {location_name}")
+#        return None
+##
 def get_weather_data():
     """
     Fetches the current weather data for New York City.
@@ -169,7 +167,6 @@ def classify_process():
     """
     while True:
         # Take a new job from Redis
-        print("Waiting for new job...")
         job_data = db.get("formData")
         if job_data:
             job_data = json.loads(job_data.decode('utf-8'))

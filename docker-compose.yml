@@ -55,15 +55,6 @@ services:
       - "6379:6379"
     networks:
       - shared_network
-  test:
-    container_name: test
-    build:
-      context: ./test
-      dockerfile: Dockerfile
-    networks:
-      - shared_network
-    depends_on:
-      - redis
 networks:
   shared_network:
     external: true
