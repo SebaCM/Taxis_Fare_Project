@@ -14,15 +14,40 @@ import openmeteo_requests
 import requests_cache
 from retry_requests import retry
 from datetime import datetime
+import googlemaps
 
 # Setup the Open-Meteo API client with cache and retry on error
 cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
 retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
 openmeteo = openmeteo_requests.Client(session=retry_session)
-
+taxi_zones = pd.read_csv('taxis_zone_geometry_official.csv')
+taxi_zones['geometry'] = taxi_zones['geometry'].apply(wkt.loads)
 # Connect to Redis and assign to variable `db`
 db = redis.Redis(host=settings.REDIS_IP,
                  port=settings.REDIS_PORT, db=settings.REDIS_DB_ID)
+api_key = "AIzaSyDnhBrF6rtcc0VS066RFF012bBd0sRJAJU"  # Replace with your actual API key
+
+def get_google_coordenate(nombre_zona, api_key):
+    """
+    Obtiene la geometría de una zona de taxi de Google Maps.
+
+    Args:
+        nombre_zona: El nombre de la zona de taxi.
+        api_key: La clave de la API de Google Maps.
+
+    Returns:
+        La geometría de la zona de taxi en formato GeoJSON.
+    """
+    gmaps = googlemaps.Client(key=api_key)
+    geocode_result = gmaps.geocode(nombre_zona)
+    location = geocode_result[0]['geometry']['location']
+    lat = location['lat']
+    lng = location['lng']
+    return {
+        "lat": lat,
+        "lng": lng,
+    }
+
 
 # Check Redis connection
 try:
@@ -56,22 +81,13 @@ def predict_duration(features):
     """
     return duration_model.predict([features])[0]
 
-def encontrar_zona_taxi(coord_x, coord_y):
-    """
-    Encuentra la zona de taxi en la que se encuentra una coordenada.
-    """
-    point = Point(coord_x, coord_y)
-    print(f"Finding taxi zone for coordinates: {coord_x}, {coord_y}")
-    for index, row in df_zones.iterrows():
-        try:
-            polygon = wkt.loads(row['geometry'])
-            if polygon.contains(point):
-                print(f"Found LocationID: {row['LocationID']} for coordinates: {coord_x}, {coord_y}")
-                return row["LocationID"]  # Exit the loop if found
-        except Exception as e:
-            print(f"Error processing polygon: {e}")
-            continue
-    print(f"No LocationID found for coordinates: {coord_x}, {coord_y}")
+def encontrar_zona_taxi(taxi_zones, coord_x, coord_y):
+    """Encuentra la zona de taxi en la que se encuentra una coordenada."""
+    punto = Point(coord_x, coord_y)
+
+    for index, row in taxi_zones.iterrows():
+        if row["geometry"] and row["geometry"].contains(punto):
+            return row["LocationID"]
     return None
 
 def get_coordinates(location_name):
@@ -169,14 +185,14 @@ def classify_process():
             distance_miles = distance_km * 0.621371  # Convert distance to miles
 
         # Get coordinates for start and end points
-            start_coords = get_coordinates(start_point)
-            end_coords = get_coordinates(end_point)
+            start_coords = get_google_coordenate(start_point,api_key)
+            end_coords = get_google_coordenate(end_point,api_key)
 
             if start_coords and end_coords:
             # Find LocationID for start and end points
-                start_location_id = encontrar_zona_taxi(start_coords[0], start_coords[1])
-                end_location_id = encontrar_zona_taxi(end_coords[0], end_coords[1])
-
+                start_location_id = encontrar_zona_taxi(taxi_zones, start_coords["lng"], start_coords["lat"])
+                end_location_id = encontrar_zona_taxi(taxi_zones, end_coords["lng"], end_coords["lat"])
+                
                 if start_location_id and end_location_id:
                 # Get weather data for New York City
                     weather_data = get_weather_data()

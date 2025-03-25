@@ -1,3 +1,4 @@
+googlemaps
 numpy
 redis
 pandas
