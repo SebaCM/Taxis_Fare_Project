@@ -1,87 +1,102 @@
-# 🚕 Taxi Fare and Trip Duration Prediction  
+🚖 Taxi Fare and Trip Duration Prediction
+This project focuses on building machine learning models to predict taxi fares and trip duration using multiple datasets. It implements models ranging from simple regressors (SGD, Random Forest) to advanced techniques like XGBoost and Neural Networks.
 
-This project focuses on building **machine learning models** to predict **taxi fares** and **trip durations** using multiple datasets. It implements models ranging from simple regressors (SGD, Random Forest) to advanced techniques like **XGBoost** and **Neural Networks**.  
+📁 Project Structure
+Data Preprocessing and Exploratory Data Analysis (EDA)
 
----
+Feature Engineering and Dimensionality Reduction
 
-## 📁 Project Structure  
+Model Training and Evaluation
 
-1. **Data Preprocessing and Exploratory Data Analysis (EDA)**  
-2. **Feature Engineering and Reduction**  
-3. **Model Training and Evaluation**  
-4. **Model Persistence (Saving and Loading Models)**  
-5. **Deployment on Google Cloud Service**  
+Model Persistence (Save and Load Models)
 
----
+Deployment on Google Cloud Service
 
-## 📊 Datasets Used  
+📊 Datasets Used
+Yellow Taxi – Taxi trip details, including fare.
 
-1. **Yellow Taxi** – Taxi ride details including fare amount.  
-2. **Taxi Zones** – Geospatial data for NYC taxi zones.  
-3. **Weather** – Weather conditions during trips.  
-4. **Traffic** – Traffic patterns and conditions.  
+Taxi Zones – Geospatial data of NYC taxi zones.
 
----
+Weather – Weather conditions during trips.
 
-## 📚 Libraries Used  
+Traffic – Traffic patterns and conditions.
 
-### Core Libraries:  
-- **Data Analysis**: `pandas`, `numpy`, `matplotlib`, `seaborn`  
-- **Machine Learning**: `scikit-learn`, `xgboost`, `tensorflow`, `keras`  
-- **Model Saving**: `joblib`  
-- **API Handling**: `requests`, `retry_requests`, `requests_cache`, `openmeteo_requests`, `sodapy`  
+📚 Libraries Used
+Core Libraries:
+Data Analysis: pandas, numpy, matplotlib, seaborn
 
----
+Machine Learning: scikit-learn, xgboost, tensorflow, keras
 
-## 🛠️ Data Preprocessing  
+Model Saving: joblib
 
-1. **Outlier Treatment**:  
-   - Applied **RobustScaler** and **StandardScaler** to handle outliers and normalize features.  
+API Handling: requests, retry_requests, requests_cache, openmeteo_requests, sodapy, googlemaps
 
-2. **Data Splitting**:  
-   - Divided datasets into:  
-     - **60%** for training  
-     - **20%** for validation  
-     - **20%** for testing  
+Inter-Container Communication: redis
 
-3. **Feature Reduction**:  
-   - Used a **correlation matrix** to remove redundant or irrelevant features.  
+🛠️ Data Preprocessing
+Handling Outliers:
+Applied RobustScaler and StandardScaler to manage outliers and normalize features.
 
----
+Data Splitting:
+Datasets were split as follows:
 
-## 🤖 Models Implemented  
+60% for training
 
-1. **SGD Regressor** – Simple and fast linear model.  
-2. **Random Forest Regressor** – Ensemble model with hyperparameter tuning.  
-3. **XGBoost Regressor** – Gradient boosting for improved performance.  
-4. **Neural Network** – Built using `tensorflow.keras`, with dropout and early stopping.  
+20% for validation
 
----
+20% for testing
 
-## 📈 Model Training and Evaluation  
+Feature Reduction:
+A correlation matrix was used to eliminate redundant or irrelevant features.
 
-Each model is evaluated using the following metrics:  
+🤖 Implemented Models
+SGD Regressor – A simple and fast linear model.
 
-- **Mean Absolute Error (MAE)** – Measures the average absolute difference.  
-- **Mean Squared Error (MSE)** – Penalizes large errors more than MAE.  
-- **Root Mean Squared Error (RMSE)** – Square root of MSE for interpretability.  
-- **R² Score** – Explains how well the model fits the data.  
+Random Forest Regressor – An ensemble model with hyperparameter tuning.
 
----
+XGBoost Regressor – Gradient boosting model for better performance.
 
-## 🚀 How to Run the Project  
+Neural Network – Built with tensorflow.keras, using dropout and early stopping.
 
-1. **Clone the repository:**  
-   ```bash
-   git clone <repository-url>
-   cd project-folder
+📈 Model Training and Evaluation
+Each model was evaluated using the following metrics:
 
-Install the required libraries:
-Ensure all dependencies from requirements.txt are installed:
+Mean Absolute Error (MAE) – Measures the average absolute difference.
 
-pip install -r requirements.txt
+Mean Squared Error (MSE) – Penalizes large errors more than MAE.
+
+Root Mean Squared Error (RMSE) – Square root of MSE for better interpretability.
+
+R² Score – Explains how well the model fits the data.
+
+🚀 How to Run the Project Locally
+
+1. Clone the Repository
+
+git clone https://github.com/SebaCM/Taxis_Fare_Project.git
+cd Taxis_Fare_Project
+
+2. Install Docker (if not already installed)
+   Ensure Docker is installed. You can download it from here.
+
+3. Build and Run the Project with Docker
+   Run the following command to build and start the project:
+
+docker-compose up --build -d
+
+This sets up the environment, builds the image, and runs the application in the background.
+
+4. Access the Service
+   Once the container is running, access the service via the following URL:
+
+http://localhost:8081/ui/index.html
+
+5. Use the Model
+   Once the environment is set up, you can test the models and make predictions by providing the relevant data. You can also evaluate the models using the metrics described in the "Model Training and Evaluation" section.
 
 🧰 Requirements (requirements.txt)
+Ensure the following libraries are included in requirements.txt:
+
 pandas
 numpy
 matplotlib
@@ -95,28 +110,68 @@ openmeteo_requests
 requests_cache
 retry_requests
 sodapy
+googlemaps
+redis
 
 ☁️ Deployment on Google Cloud Service
-The project is deployed using Google Cloud Service, utilizing:
+To deploy the project on Google Cloud, follow these steps:
 
-Virtual Machines (VMs) – For model hosting.
+1. Set Up a Virtual Machine (VM) on Google Cloud
+   Create a Google Cloud project and enable billing.
 
-Google Maps API – For real-time geolocation and route calculations.
+Set up a Virtual Machine (VM) to host the model and API.
 
-Steps for Deployment:
-Set up a Google Cloud VM with necessary resources.
+Select an appropriate machine type based on your needs.
 
-Install project dependencies using requirements.txt.
+2. Enable Bidirectional Communication
+   You must open port 8081 in the firewall rules to allow bidirectional communication.
 
-Deploy the trained models and serve predictions via API.
+Go to the Google Cloud Console.
+
+Navigate to VPC Network > Firewall.
+
+Create a new firewall rule:
+
+Name: allow-taxi-api
+
+Traffic Direction: Ingress and Egress (bidirectional)
+
+IP Range: 0.0.0.0/0
+
+Protocols and Ports: tcp:8081
+
+Save the changes.
+
+3. Install Dependencies on the VM
+   Access your VM and clone the repository:
+
+git clone https://github.com/SebaCM/Taxis_Fare_Project.git
+cd Taxis_Fare_Project
+
+Install the dependencies from requirements.txt:
+
+pip install -r requirements.txt
+
+4. Deploy the Trained Models
+   Load the pre-trained models saved with joblib or TensorFlow/Keras.
+
+Run the contanier of model, it's already configured to work
+
+5. Expose the API
+   Use Google Cloud API Gateway or App Engine to expose your API.
+
+Ensure port 8081 is open and accessible.
+
+6. Monitor and Maintain
+   Use Google Cloud Logging to track model performance and usage.
 
 📌 Future Improvements
-Enhanced Hyperparameter Tuning – Using Grid Search and Bayesian Optimization.
+Hyperparameter Optimization – Using Grid Search and Bayesian Optimization.
 
-LSTM Models – For better time-series prediction.
+LSTM Models – To improve time-series predictions.
 
-Model Interpretability – Use SHAP or LIME to understand predictions.
+Model Interpretability – Use SHAP or LIME to explain predictions.
 
-Real-Time Predictions – Optimize API response time for faster results.
+Real-Time Predictions – Optimize the API’s response time.
 
-✅ This project demonstrates a robust pipeline for taxi fare and trip duration prediction, combining data preprocessing, model development, and cloud deployment.
+✅ This project demonstrates a robust pipeline for predicting taxi fares and trip durations, combining data preprocessing, model development, and cloud deployment.
