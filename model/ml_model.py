@@ -13,16 +13,19 @@ import requests_cache
 from retry_requests import retry
 from datetime import datetime
 import googlemaps
-
+from datetime import datetime
+import pytz
 # Setup the Open-Meteo API client with cache and retry on error
 cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
 retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
 openmeteo = openmeteo_requests.Client(session=retry_session)
 taxi_zones = pd.read_csv('taxis_zone_geometry_official.csv')
 taxi_zones['geometry'] = taxi_zones['geometry'].apply(wkt.loads)
+
 # Connect to Redis and assign to variable `db`
 db = redis.Redis(host=settings.REDIS_IP,
                  port=settings.REDIS_PORT, db=settings.REDIS_DB_ID)
+
 api_key = "AIzaSyDnhBrF6rtcc0VS066RFF012bBd0sRJAJU"  # Replace with your actual API key
 
 def get_google_coordenate(nombre_zona, api_key):
@@ -88,26 +91,6 @@ def encontrar_zona_taxi(taxi_zones, coord_x, coord_y):
             return row["LocationID"]
     return None
 
-## def get_coordinates(location_name):
-#    """
-#    Translates a location name into latitude and longitude coordinates.
-
-#    Args:
-#        location_name: The name of the location (e.g., "Empire State Building").
-
-#    Returns:
-#        A tuple containing the latitude and longitude coordinates, or None if the 
-#        location is not found.
-#    """
-#    geolocator = Nominatim(user_agent="my_geocoder")  # Provide a user agent
-#    location = geolocator.geocode(location_name)
-#    if location:
-#        print(f"Coordinates for {location_name}: {location.latitude}, {location.longitude}")
-#        return location.longitude, location.latitude 
-#    else:
-#        print(f"Coordinates not found for {location_name}")
-#        return None
-##
 def get_weather_data():
     """
     Fetches the current weather data for New York City.
@@ -115,6 +98,15 @@ def get_weather_data():
     Returns:
         A dictionary containing the weather data.
     """
+    ny_timezone = pytz.timezone('America/New_York')
+
+    # Obtener la hora actual en Nueva York
+    ny_time = datetime.now(ny_timezone)
+
+    # Obtener la hora actual en formato ISO para buscar en los datos horarios
+    current_hour = ny_time.strftime("%H")
+    current_hour=int(current_hour)
+
     latitude = 40.7143
     longitude = -74.006
     url = "https://api.open-meteo.com/v1/forecast"
@@ -133,16 +125,13 @@ def get_weather_data():
     current_precipitation = current.Variables(2).Value()						
     current_weather_code = current.Variables(0).Value()
     current_is_day = current.Variables(1).Value()
-    hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()[0]
-    hourly_rain = hourly.Variables(1).ValuesAsNumpy()[0]
-    hourly_showers = hourly.Variables(2).ValuesAsNumpy()[0]
-    hourly_snowfall = hourly.Variables(3).ValuesAsNumpy()[0]
-    hourly_snow_depth = hourly.Variables(4).ValuesAsNumpy()[0]
-    hourly_weather_code = hourly.Variables(5).ValuesAsNumpy()[0]
+    hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()[current_hour]
+    hourly_rain = hourly.Variables(1).ValuesAsNumpy()[current_hour]
+    hourly_showers = hourly.Variables(2).ValuesAsNumpy()[current_hour]
+    hourly_snowfall = hourly.Variables(3).ValuesAsNumpy()[current_hour]
+    hourly_snow_depth = hourly.Variables(4).ValuesAsNumpy()[current_hour]
+    hourly_weather_code = hourly.Variables(5).ValuesAsNumpy()[current_hour]
 
-    # Get current time details
-    current_time = datetime.now()
-    current_hour = current_time.strftime("%Y-%m-%dT%H:00")
 
     # Find the index of the current hour in the hourly data
     print(f"Weather data for New York City at {current_hour}: {current_weather_code}, {current_is_day}, {hourly_temperature_2m}, {hourly_rain}, {hourly_showers}, {hourly_snowfall}, {hourly_snow_depth}, {hourly_weather_code}")
@@ -167,13 +156,17 @@ def classify_process():
     """
     while True:
         # Take a new job from Redis
-        job_data = db.get("formData")
-        if job_data:
-            job_data = json.loads(job_data.decode('utf-8'))
-            print(f"Received job data: {job_data}")
-
+        result = db.brpop("predictionQueue", timeout=settings.SERVER_SLEEP)
+        if result:
+            queue_name, job_str = result
+            job_data = json.loads(job_str.decode('utf-8'))
+            job_id = job_data['id']
+            form_data = job_data["formData"]
+            #{id:numero, formData: {startPoint: "nombre de la zona", endPoint: "nombre de la zona", passengerCount: 1, duration: 0, distance: 0}}
+                        
+            print(f"Processing job ID: {job_id}")
+            print(f"Job data: {form_data}")
         # Extract the necessary data from the job
-            form_data = job_data
             start_point = form_data["startPoint"]
             end_point = form_data["endPoint"]
             passenger_count = int(form_data["passengerCount"])
@@ -240,14 +233,14 @@ def classify_process():
                 print(f"Duration prediction: {duration_prediction}")
     
                     # Prepare the output
-                output = {
-                        "fare": round(float(fare_prediction*10),2),
-                        "duration": round(float(duration_prediction*10),2)
+                output ={job_id: {
+                        "fare": round(float(fare_prediction * 10), 2),
+                        "duration": round(float(duration_prediction * 10), 2)
                     }
-    
+                }
                     # Store the results on Redis using the original job ID as the key
                 db.set("tripPredict", json.dumps(output))
-                db.delete("formData")  # Delete the job from the queue
+                db.delete(job_id)
                 print(f"Stored prediction results in Redis: {output}")
             else:
                 print("Error processing job data. Skipping...")

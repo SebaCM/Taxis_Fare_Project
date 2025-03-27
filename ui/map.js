@@ -1,5 +1,6 @@
 let map; // Declara la variable map fuera de initMap
 let directionsRenderer;
+let id;
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 12,
@@ -14,7 +15,7 @@ function initMap() {
 }
 
 function getPredict() {
-  fetch("/api/tripPredict") // Usamos 'node_redis' como hostname
+  fetch(`/api/tripPredict?id=${id}`)
     .then((response) => response.json())
     .then((data) => {
       // Actualiza los elementos HTML con los datos recibidos
@@ -29,6 +30,7 @@ function getPredict() {
     .catch((error) => console.error("Error al obtener datos del mapa:", error));
 }
 document.addEventListener("DOMContentLoaded", function () {
+  id=uuidv4();
   setInterval(getPredict, 2000);
 });
 function sendFormDataToRedis(distance, duration) {
@@ -44,18 +46,22 @@ function sendFormDataToRedis(distance, duration) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      startPoint,
-      endPoint,
-      passengerCount,
-      distance,
-      duration,
-    }),
+      formData:{ // <-- ID becomes the key, and the data is the value
+        id,
+        startPoint,
+        endPoint,
+        passengerCount,
+        distance,
+        duration,
+      }
+    }), 
   })
     .then((response) => response.text())
     .then((data) => console.log(data))
     .catch((error) =>
       console.error("Error al enviar datos del formulario:", error)
     );
+
 }
 
 document.addEventListener("DOMContentLoaded", function () {
