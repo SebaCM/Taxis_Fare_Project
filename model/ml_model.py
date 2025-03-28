@@ -188,8 +188,9 @@ def classify_process():
                     weather_data = get_weather_data()
 
                 # Get current time details
-                    current_time = datetime.now()
-                hour = current_time.hour
+                ny_timezone = pytz.timezone('America/New_York')
+                current_time = datetime.now(ny_timezone)
+                hour = current_time.hour 
                 month = current_time.month
                 day_of_week = current_time.weekday()
     
