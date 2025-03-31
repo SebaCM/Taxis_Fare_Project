@@ -38,7 +38,10 @@ function sendFormDataToRedis(distance, duration) {
   const startPoint = document.getElementById("Start Point-formbuilder-1").value;
   const endPoint = document.getElementById("End point-formbuilder-1").value;
   const passengerCount = document.getElementById("Number-formbuilder-1").value;
-
+if (passengerCount>5){
+    alert(
+        "You have surpassed maximum passenger limit by regulations");
+}
   // Envía los datos al servidor Node.js
   fetch("/api/formData", {
     method: "POST",
@@ -77,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!startPoint || !endPoint) {
       alert(
-        "Por favor, introduce tanto el punto de origen como el de destino."
+        "Please enter both the origin and destination points."
       );
       return;
     }
