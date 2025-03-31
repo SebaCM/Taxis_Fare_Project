@@ -27,7 +27,7 @@ function getPredict() {
       ).innerHTML = `<b>    Predicted Time</b> ${data.duration}min`;
       // ... (actualiza otros elementos según sea necesario) ...
     })
-    .catch((error) => console.error("Error al obtener datos del mapa:", error));
+    .catch((error) => console.error("Failed to fetch data from maps:", error));
 }
 document.addEventListener("DOMContentLoaded", function () {
   id=uuidv4();
@@ -62,7 +62,7 @@ if (passengerCount>5){
     .then((response) => response.text())
     .then((data) => console.log(data))
     .catch((error) =>
-      console.error("Error al enviar datos del formulario:", error)
+      console.error("Failed to send form data:", error)
     );
 
 }
@@ -147,22 +147,22 @@ async function calculateAndDisplayRoute(origin, destination) {
                       )} km`;
                       resolve({ distance: distance, duration: duration });
                     } else {
-                      reject("No se encontraron rutas: " + status);
+                      reject("No routes found: " + status);
                     }
                   }
                 );
               } else {
                 reject(
-                  "Uno o ambos puntos están fuera de la ciudad de Nueva York."
+                  "One or both points are aout of New york."
                 );
               }
             } else {
-              reject("No se pudo geocodificar el punto de destino.");
+              reject("Can't geocode destination.");
             }
           }
         );
       } else {
-        reject("No se pudo geocodificar el punto de origen.");
+        reject("Can't geocode origin: " + statusOrigin);
       }
     });
   });
