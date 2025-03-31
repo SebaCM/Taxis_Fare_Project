@@ -185,24 +185,16 @@ def classify_process():
                 
                 if start_location_id and end_location_id:
                 # Get weather data for New York City
-                    weather_data = get_weather_data()
+                   weather_data = get_weather_data()
 
                 # Get current time details
-<<<<<<< HEAD
-                    ny_timezone = pytz.timezone('America/New_York')
+                ny_timezone = pytz.timezone('America/New_York')
 
-    # Obtener la hora actual en Nueva York
+                # Obtener la hora actual en Nueva York
                 ny_time = datetime.now(ny_timezone)
                 hour = ny_time.hour
                 month = ny_time.month
                 day_of_week = ny_time.weekday()
-=======
-                ny_timezone = pytz.timezone('America/New_York')
-                current_time = datetime.now(ny_timezone)
-                hour = current_time.hour 
-                month = current_time.month
-                day_of_week = current_time.weekday()
->>>>>>> d02ace5e65b454e37cea88a265371daa47c8b80d
     
                 # Prepare features for prediction
                 fare_features = [
