@@ -188,10 +188,13 @@ def classify_process():
                     weather_data = get_weather_data()
 
                 # Get current time details
-                    current_time = datetime.now()
-                hour = current_time.hour
-                month = current_time.month
-                day_of_week = current_time.weekday()
+                    ny_timezone = pytz.timezone('America/New_York')
+
+    # Obtener la hora actual en Nueva York
+                ny_time = datetime.now(ny_timezone)
+                hour = ny_time.hour
+                month = ny_time.month
+                day_of_week = ny_time.weekday()
     
                 # Prepare features for prediction
                 fare_features = [
@@ -240,7 +243,6 @@ def classify_process():
                 }
                     # Store the results on Redis using the original job ID as the key
                 db.set("tripPredict", json.dumps(output))
-                db.delete(job_id)
                 print(f"Stored prediction results in Redis: {output}")
             else:
                 print("Error processing job data. Skipping...")
